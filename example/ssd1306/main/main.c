@@ -13,6 +13,7 @@ void app_main(void)
 {
 	i2c_master_init(SDA_PIN, SCL_PIN);
 	oled_display_init();
+	oled_display_configure();
 
   while(1)
   {

@@ -31,7 +31,7 @@ void i2c_master_init(BYTE bySDA_pin, BYTE bySCL_pin)
 	i2c_driver_install(I2C_NUM_0, I2C_MODE_MASTER, 0, 0, 0);
 }
 
-void oled_display_init() 
+void oled_display_init(void) 
 {
 	esp_err_t espRc;
 	i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -44,8 +44,8 @@ void oled_display_init()
 	i2c_master_write_byte(cmd, OLED_CMD_CHARGE_PUMP_SETTING, true);
 	i2c_master_write_byte(cmd, OLED_CMD_CHARGE_PUMP_ENABLE, true);
 
-	i2c_master_write_byte(cmd, OLED_CMD_SET_SEGMENT_REMAP, true); // reverse left-right mapping
-	i2c_master_write_byte(cmd, OLED_CMD_SET_COM_SCAN_MODE, true); // reverse up-bottom mapping
+	//i2c_master_write_byte(cmd, OLED_CMD_SET_SEGMENT_REMAP, true); // reverse left-right mapping
+	//i2c_master_write_byte(cmd, OLED_CMD_SET_COM_SCAN_MODE, true); // reverse up-bottom mapping
 
 	i2c_master_write_byte(cmd, OLED_CMD_SET_CONTRAST, true);
 	i2c_master_write_byte(cmd, SSD1306_MAX_CONTRAST, true);
@@ -87,7 +87,7 @@ void oled_display_sendCommand(BYTE byCommand)
 	i2c_cmd_link_delete(cmd);
 }
 
-BOOL oled_display_check()
+BOOL oled_display_check(void)
 {
   i2c_cmd_handle_t cmd;
 	esp_err_t espRc;
@@ -154,7 +154,7 @@ void oled_display_setFontTableLookupFunction(FontTableLookupFunction function)
   fontTableLookupFunction = function;
 }
 
-void fillBuffer()
+void fillBuffer(void)
 {
 	for (WORD i = 0; i < OLED_DISPLAY_BUFFER_SIZE/8; i++)
 	{
@@ -166,7 +166,7 @@ void fillBuffer()
 	}
 }
 
-void printfBuffer()
+void printfBuffer(void)
 {
 	for (WORD i = 0; i < OLED_DISPLAY_BUFFER_SIZE/8; i++)
 	{
@@ -978,10 +978,9 @@ void oled_display_clearBuffer(void)
   memset(fs_abyBuffer, 0, OLED_DISPLAY_BUFFER_SIZE/8);
 }
 
-
-void oled_display_send_buffer()
+void oled_display_configure(void)
 {
-  i2c_cmd_handle_t cmd;
+	i2c_cmd_handle_t cmd;
 	esp_err_t espRc;
   BYTE byX_offset = 0;
 
@@ -1008,11 +1007,17 @@ void oled_display_send_buffer()
 	espRc = i2c_master_cmd_begin(I2C_NUM_0, cmd, 10/portTICK_PERIOD_MS);
 	if (espRc != ESP_OK) 
 	{
-		ESP_LOGI(TAG_DISPLAY, "Error sending buffer to display (setting commands)");
+		ESP_LOGE(TAG_DISPLAY, "Sending buffer to display (setting commands)");
 	}
 	i2c_cmd_link_delete(cmd);
+}
 
-  // Now finally send buffer
+void oled_display_send_buffer(void)
+{
+  i2c_cmd_handle_t cmd;
+	esp_err_t espRc;
+
+  // Send buffer
 	cmd = i2c_cmd_link_create();
 	i2c_master_start(cmd);
 	i2c_master_write_byte(cmd, (OLED_I2C_ADDRESS << 1) | I2C_MASTER_WRITE, true);
@@ -1022,14 +1027,14 @@ void oled_display_send_buffer()
   espRc = i2c_master_cmd_begin(I2C_NUM_0, cmd, 10/portTICK_PERIOD_MS);
 	if (espRc != ESP_OK) 
 	{
-		ESP_LOGI(TAG_DISPLAY, "Error sending buffer to display (buffer sending error)");
+		ESP_LOGE(TAG_DISPLAY, "Sending buffer to display (buffer sending error)");
 	}
 	i2c_cmd_link_delete(cmd);
 }
 
 /*
 // some base for scrolling... check pdf for more info...
-void ssd1306_scroll() 
+void ssd1306_scroll(void) 
 {
 	esp_err_t espRc;
 

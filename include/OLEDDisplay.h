@@ -2,7 +2,7 @@
 #define __OLEDDisplay_h
 
 /*
- * Copied and modified from:
+ * Modified from:
  *   - https://github.com/yanbe/ssd1306-esp-idf-i2c
  *   - https://github.com/ThingPulse/esp8266-oled-ssd1306
  * 
@@ -79,20 +79,23 @@ void oled_display_setColor(EOLED_DISPLAY_PIXEL_COLOR eColor);
 void oled_display_setTextAlignment(EOLED_DISPLAY_TEXT_ALIGNMENT eTextAlignment);
 void oled_display_setFont(const char* pszFontData);
 
+// Configure OLED display to your needs
+void oled_display_configure(void);
+
 // Send buffer from uC to OLED
-void oled_display_send_buffer();
+void oled_display_send_buffer(void);
 
 // Clear buffer (uC)
-void oled_display_clearBuffer();
+void oled_display_clearBuffer(void);
 
 // Set the function that will convert utf-8 to font table index
 void oled_display_setFontTableLookupFunction(FontTableLookupFunction function);
 
 // Fill buffer with some pattern
-void fillBuffer();
+void fillBuffer(void);
 
 // Print buffer to serial output
-void printfBuffer();
+void printfBuffer(void);
 
 // Set color of the pixels
 void oled_display_setColor(EOLED_DISPLAY_PIXEL_COLOR eColor);
